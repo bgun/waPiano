@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html>
 <body>
 <style>
   html, body {
@@ -8,14 +9,13 @@
     list-style: none;
     margin: 0 auto;
     padding: 0;
-    width: 1320px;
   }
   #keyboard li {
     background: #FFF;
     border: 1px solid red;
     float: left;
     height: 100px;
-    width: 20px;
+    width: 1%;
   }
   #keyboard li.white {
     background: #FFF;
@@ -24,22 +24,14 @@
     background: #000;
   }
 </style>
-<ul id="keyboard"></ul><script>
+<ul id="keyboard"></ul>
+<script>
+'use strict';
 (function() {
   var audioCtx = new (AudioContext || webkitAudioContext)();
   var freqs = [16.35, 17.325, 18.355, 19.45, 20.60, 21.83, 23.125, 24.50, 25.96, 27.50, 29.14, 30.87];
-  var black = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0]
-
-  function Key(isBlack, frequency) {
-    var keyEl = document.createElement('li');
-    keyEl.className = isBlack ? "black" : "white"
-    this.sound = new Sound(frequency);
-    keyEl.addEventListener('mousedown', this.sound.play);
-    keyEl.addEventListener('mouseup',   this.sound.stop);
-    return {
-      html: keyEl
-    };
-  };
+  var black = [0,1,0,1,0,0,1,0,1,0,1,0];
+  var octave, key;
 
   function Sound(frequency) {
     this.pressed = false; // flag to indicate if sound is playing
@@ -61,15 +53,28 @@
     }).bind(this);
   };
 
-  var newf = [];
-  for(var o = 2; o < 7; o++) { // octaves
-    newf = freqs.map(function(f) {
-      return f*(Math.pow(2,o));
-    });
-    for(var f in freqs) {
-      var key = new Key(black[f], newf[f]);
-      document.getElementById('keyboard').appendChild(key.html);
-    }
+  function Key(is_black, frequency) {
+    var keyEl = document.createElement('li');
+    keyEl.className = is_black ? "black" : "white"
+    this.sound = new Sound(frequency);
+    keyEl.addEventListener('mousedown', this.sound.play);
+    keyEl.addEventListener('mouseup',   this.sound.stop);
+    return {
+      html: keyEl
+    };
+  };
+
+  for(octave = 1; octave <= 6; octave++) { // octaves
+    freqs
+      .map(function(f) {
+        return f*(Math.pow(2, octave));
+      })
+      .forEach(function(f, i) {
+        var key = new Key(black[i], f);
+        document.getElementById('keyboard').appendChild(key.html);
+      });
   }
 })();
-</script></body>
+</script>
+</body>
+</html>
